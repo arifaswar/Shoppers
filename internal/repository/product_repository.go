@@ -12,7 +12,9 @@ func CreateProduct(product *domain.Product) error {
 func GetProducts() ([]domain.Product, error) {
 	var products []domain.Product
 
-	err := database.DB.Find(&products).Error
+	err := database.DB.
+		Preload("Category").
+		Find(&products).Error
 
 	if err !=nil {
 		return nil, err
@@ -25,6 +27,7 @@ func GetProductById(id string) (*domain.Product, error) {
 	var product domain.Product
 
 	err := database.DB.
+		Preload("Category").
 		Where("id = ?", id).
 		First(&product).
 		Error

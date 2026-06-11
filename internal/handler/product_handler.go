@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"shoppers/internal/service"
+	"fmt"
 	
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +13,7 @@ type CreateProductRequest struct {
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
 	Stock       int     `json:"stock" binding:"required"`
+	CategoryID  string  `json:"category_id" binding:"required"`
 	ImageURL    string  `json:"image_url"`
 }
 
@@ -27,11 +29,14 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
+	fmt.Printf("REQUEST: %+v\n", req)
+
 	err = service.CreateProduct(
 		req.Name,
 		req.Description,
 		req.Price,
 		req.Stock,
+		req.CategoryID,
 		req.ImageURL,
 	)
 
@@ -48,7 +53,7 @@ func CreateProduct(c *gin.Context) {
 }
 
 func GetProducts(c *gin.Context) {
-
+	
 	products, err := service.GetProducts()
 
 	if err != nil {

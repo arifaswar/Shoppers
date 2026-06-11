@@ -32,11 +32,18 @@ func SetupRoutes(r *gin.Engine) {
 
 		product := api.Group("/products")
 		{
-			product.GET("/", handler.GetProducts)
-			product.GET("/:id", handler.GetProductById)
-			product.POST("/", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.CreateProduct)
-			product.PUT("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.UpdateProduct)
-			product.DELETE("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.DeleteProduct)
+			product.GET("", handler.GetProducts)
+			product.GET(":id", handler.GetProductById)
+			product.POST("", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.CreateProduct)
+			product.PUT(":id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.UpdateProduct)
+			product.DELETE(":id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.DeleteProduct)
+		}
+
+		category := api.Group("/category")
+		{
+			category.GET("", handler.GetCategories)
+			category.POST("", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.CreateCategory)
+			category.GET(":id", handler.GetCategoryById)	
 		}
 	}
 }

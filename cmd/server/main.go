@@ -17,6 +17,7 @@ func main() {
 	err := database.DB.AutoMigrate(
 		&domain.User{},
 		&domain.Product{},
+		&domain.Category{},
 	)
 	if err != nil {
 		panic(err)

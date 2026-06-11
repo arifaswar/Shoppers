@@ -3,6 +3,8 @@ package service
 import (
 	"shoppers/internal/domain"
 	"shoppers/internal/repository"
+
+	"github.com/google/uuid"
 )
 
 func CreateProduct(
@@ -10,13 +12,26 @@ func CreateProduct(
 	description string,
 	price float64,
 	stock int,
+	categoryID string,
 	imageURL string,
 ) error {
+
+	categoryUUID, err := uuid.Parse(categoryID)
+	if err != nil {
+		return err
+	}
+
+	_, err = repository.GetCategoryById(categoryID)
+	if err != nil {
+		return err
+	}
+
 	product := domain.Product{
 		Name: name,
 		Description: description,
 		Price: price,
 		Stock: stock,
+		CategoryID: categoryUUID,
 		ImageURL: imageURL,
 	}
 
