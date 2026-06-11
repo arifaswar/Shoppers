@@ -1,9 +1,13 @@
 package main
 
 import (
+	"shoppers/internal/config"
 	"shoppers/internal/database"
 	"shoppers/internal/domain"
-	"shoppers/internal/config")
+	"shoppers/internal/routes"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	config.LoadEnv()
@@ -12,8 +16,15 @@ func main() {
 
 	err := database.DB.AutoMigrate(
 		&domain.User{},
+		&domain.Product{},
 	)
 	if err != nil {
 		panic(err)
 	}
+
+	router := gin.Default()
+
+	routes.SetupRoutes(router)
+
+	router.Run(":3000")
 }
