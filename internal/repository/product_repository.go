@@ -20,3 +20,26 @@ func GetProducts() ([]domain.Product, error) {
 
 	return products, nil
 }
+
+func GetProductById(id string) (*domain.Product, error) {
+	var product domain.Product
+
+	err := database.DB.
+		Where("id = ?", id).
+		First(&product).
+		Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
+
+func UpdateProduct(product *domain.Product) error {
+	return database.DB.Save(product).Error
+}
+
+func DeleteProduct(id string) error {
+	return database.DB.Delete(&domain.Product{}, "id = ?", id).Error
+}

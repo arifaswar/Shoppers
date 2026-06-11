@@ -50,6 +50,7 @@ func Login(
 
 	token, err := GenerateToken(
 		user.ID.String(),
+		user.Role,
 	)
 
 	if err != nil {

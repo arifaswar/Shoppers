@@ -62,3 +62,60 @@ func GetProducts(c *gin.Context) {
 		"products" : products,
 	})
 }
+
+func GetProductById(c *gin.Context) {
+	id := c.Query("id")
+
+	product, err := service.GetProductById(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message" : err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"product" : product,
+	})
+}
+
+func UpdateProduct(c *gin.Context) {
+	id := c.Query("id")
+
+	var req CreateProductRequest
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message" : err.Error(),
+		})
+		return
+	}
+
+	err = service.UpdateProduct(id, req.Name, req.Description, req.Price, req.Stock, req.ImageURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message" : err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message" : "Product updated successfully",
+	})
+}
+
+func DeleteProduct(c *gin.Context) {
+	id := c.Query("id")
+
+	err := service.DeleteProduct(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message" : err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message" : "Product deleted successfully",
+	})
+}
