@@ -18,6 +18,8 @@ func main() {
 		&domain.User{},
 		&domain.Product{},
 		&domain.Category{},
+		&domain.Cart{},
+		&domain.CartItem{},
 	)
 	if err != nil {
 		panic(err)

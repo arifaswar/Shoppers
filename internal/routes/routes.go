@@ -45,5 +45,13 @@ func SetupRoutes(r *gin.Engine) {
 			category.POST("", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.CreateCategory)
 			category.GET(":id", handler.GetCategoryById)	
 		}
+
+		cart := api.Group("/cart")
+		cart.Use(middleware.AuthMiddleware())
+		{
+			cart.POST("/add", handler.AddToCart)
+			cart.GET("", handler.GetCart)
+			// cart.DELETE("/remove", handler.RemoveFromCart)
+		}
 	}
 }
