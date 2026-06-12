@@ -10,7 +10,7 @@ import (
 type CartItem struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 	CartID uuid.UUID `gorm:"type:uuid;not null" json:"cart_id"`
-	Cart Cart `gorm:"foreignKey:CartID" json:"cart"`
+	Cart Cart `gorm:"foreignKey:CartID" json:"-"`
 	ProductID uuid.UUID `gorm:"type:uuid;not null" json:"product_id"`
 	Product Product `gorm:"foreignKey:ProductID" json:"-"`
 	Quantity int `gorm:"not null" json:"quantity"`

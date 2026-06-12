@@ -50,8 +50,11 @@ func SetupRoutes(r *gin.Engine) {
 		cart.Use(middleware.AuthMiddleware())
 		{
 			cart.POST("/add", handler.AddToCart)
-			cart.GET("", handler.GetCart)
-			// cart.DELETE("/remove", handler.RemoveFromCart)
+			cart.GET("", handler.GetCartByUserId)
+			cart.GET("/items", handler.GetCartItems)
+			cart.PUT("/items", handler.UpdateCartItem)
+			cart.DELETE("/items", handler.DeleteCartItem)
+			cart.POST("/checkout", handler.Checkout)
 		}
 	}
 }
