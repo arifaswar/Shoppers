@@ -22,6 +22,7 @@ func main() {
 		&domain.CartItem{},
 		&domain.Order{},
 		&domain.OrderItem{},
+		&domain.Address{},
 	)
 	if err != nil {
 		panic(err)

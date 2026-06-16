@@ -25,15 +25,17 @@ func GetCartById(id string) (*domain.Cart, error) {
 	return &cart, nil
 }
 
-func GetCartByUserId(userId string) (*domain.Cart, error) {
+func GetCartByUserId(userID string) (*domain.Cart, error) {
 	
 	var cart domain.Cart
+
+	fmt.Printf("Getting cart for userID: %s\n", userID)
 
 	err := database.DB.
 		Preload("User").
 		Preload("Items").
 		Preload("Items.Product").
-		Where("user_id = ?", userId).
+		Where("user_id = ?", userID).
 		First(&cart).
 		Error
 	if err != nil {

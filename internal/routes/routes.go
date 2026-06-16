@@ -56,5 +56,25 @@ func SetupRoutes(r *gin.Engine) {
 			cart.DELETE("/items", handler.DeleteCartItem)
 			cart.POST("/checkout", handler.Checkout)
 		}
+
+		order := api.Group("/orders")
+		order.Use(middleware.AuthMiddleware())
+		{
+			order.GET("/my_orders", handler.GetMyOrders)
+			order.GET("", handler.GetOrderByID)
+		}
+
+		admin := api.Group("/admin")
+		admin.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+		{
+			admin.PUT("/orders/:id/status", handler.UpdateOrderStatus)
+		}
+
+		address := api.Group("/address")
+		address.Use(middleware.AuthMiddleware())
+		{
+			address.POST("", handler.CreateAddress)
+			address.GET("", handler.GetAddressByUserID)
+		}
 	}
 }
