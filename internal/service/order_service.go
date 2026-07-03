@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"shoppers/internal/database"
 	"shoppers/internal/domain"
 	"shoppers/internal/dto"
@@ -38,6 +39,7 @@ func Checkout(userID string, addressID string) (*dto.CheckoutResponse, error) {
 	}
 
 	var response *dto.CheckoutResponse
+
 	err = database.DB.Transaction(func(tx *gorm.DB) error {
 		total := 0.0
 		for _, item := range cart.Items {
@@ -46,7 +48,7 @@ func Checkout(userID string, addressID string) (*dto.CheckoutResponse, error) {
 		}
 
 		order := domain.Order{
-			ID:            uuid.New(),
+			ID:        uuid.New(),
 			UserID:        userUUID,
 			Status:        domain.OrderStatus(domain.OrderPending),
 			RecipientName: address.RecipientName,
@@ -85,7 +87,7 @@ func Checkout(userID string, addressID string) (*dto.CheckoutResponse, error) {
 		}
 
 		response = &dto.CheckoutResponse{
-			OrderID: order.ID.String(),
+			OrderID: order.ID,
 			Total:   order.Total,
 			Status:  string(order.Status),
 		}
@@ -98,7 +100,25 @@ func Checkout(userID string, addressID string) (*dto.CheckoutResponse, error) {
 	return response, nil
 }
 
+func GetAllOrders() ([]dto.OrderResponse, error) {
+	orders, err := repository.GetAllOrders()
+	if err != nil {
+		return nil, err
+	}
+	var response []dto.OrderResponse
+	for _, order := range orders {
+		response = append(response, dto.OrderResponse{
+			OrderID: order.ID,
+			Total:   order.Total,
+			Status:  string(order.Status),
+		})
+	}
+	return response, nil
+}
+
 func GetMyOrders(userID string) ([]dto.OrderResponse, error) {
+
+	fmt.Printf("Getting orders for user %s", userID)
 
 	userUUID, err := uuid.Parse(userID)
 	if err != nil {
@@ -111,7 +131,7 @@ func GetMyOrders(userID string) ([]dto.OrderResponse, error) {
 	var response []dto.OrderResponse
 	for _, order := range orders {
 		response = append(response, dto.OrderResponse{
-			OrderID: order.ID.String(),
+			OrderID: order.ID,
 			Total:   order.Total,
 			Status:  string(order.Status),
 		})
@@ -130,7 +150,7 @@ func GetOrderByID(orderID string) (*dto.OrderResponse, error) {
 		return nil, err
 	}
 	response := &dto.OrderResponse{
-		OrderID: order.ID.String(),
+		OrderID: order.ID,
 		Total:   order.Total,
 		Status:  string(order.Status),
 	}
@@ -146,5 +166,36 @@ func UpdateOrderStatus(orderID string, status string) error {
 
 	order.Status = domain.OrderStatus(status)
 
-	return repository.UpdateOrderStatus(order.ID.String(), order.Status)
+	err = repository.UpdateOrder(order)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func CancelOrder(userID string, orderID string) error {
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return err
+	}
+	orderUUID, err := uuid.Parse(orderID)
+	if err != nil {
+		return err
+	}
+
+	order, err := repository.GetOrderByID(orderUUID.String())
+	if err != nil {
+		return err
+	}
+
+	if order.UserID != userUUID {
+		return errors.New("order does not belong to user")
+	}
+
+	if order.Status != domain.OrderStatus(domain.OrderPending) {
+		return errors.New("only pending orders can be deleted")
+	}
+
+	order.Status = domain.OrderStatus(domain.OrderCancelled)
+	return repository.UpdateOrder(order)
 }

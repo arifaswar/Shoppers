@@ -110,8 +110,8 @@ func GetCartItems(userID string) (*dto.CartResponse, error) {
 	for _, item := range cart.Items {
 		subtotal := float64(item.Quantity) * item.Product.Price
 		response.Items = append(response.Items, dto.CartItemResponse{
-			ID:          item.ID.String(),
-			ProductID:   item.ProductID.String(),
+			ID:          item.ID,
+			ProductID:   item.ProductID,
 			ProductName: item.Product.Name,
 			Price:       item.Product.Price,
 			Quantity:    item.Quantity,

@@ -8,8 +8,8 @@ import (
 )
 
 type Address struct {
-	ID        uuid.UUID `gorm:"type:char(36);primaryKey" json:"id"`
-	UserID    uuid.UUID `gorm:"type:char(36)" json:"user_id"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	UserID    uuid.UUID `gorm:"type:uuid" json:"user_id"`
 	User	  User `gorm:"foreignKey:UserID" json:"-"` 
 	Label     string `gorm:"type:varchar(100)" json:"label"`
 	RecipientName string `gorm:"type:varchar(255)" json:"recipient_name"`

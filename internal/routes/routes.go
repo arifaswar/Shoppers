@@ -27,7 +27,7 @@ func SetupRoutes(r *gin.Engine) {
 		protected := api.Group("/user")
 		protected.Use(middleware.AuthMiddleware())
 		{
-			protected.GET("/profile",handler.Profile)
+			protected.GET("/profile", handler.Profile)
 		}
 
 		product := api.Group("/products")
@@ -43,7 +43,7 @@ func SetupRoutes(r *gin.Engine) {
 		{
 			category.GET("", handler.GetCategories)
 			category.POST("", middleware.AuthMiddleware(), middleware.AdminMiddleware(), handler.CreateCategory)
-			category.GET(":id", handler.GetCategoryById)	
+			category.GET(":id", handler.GetCategoryById)
 		}
 
 		cart := api.Group("/cart")
@@ -61,13 +61,16 @@ func SetupRoutes(r *gin.Engine) {
 		order.Use(middleware.AuthMiddleware())
 		{
 			order.GET("/my_orders", handler.GetMyOrders)
-			order.GET("", handler.GetOrderByID)
+			order.GET("/:id", handler.GetOrderByID)
+			order.PATCH("/:id/cancel", handler.CancelOrder)
 		}
 
 		admin := api.Group("/admin")
 		admin.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
 		{
-			admin.PUT("/orders/:id/status", handler.UpdateOrderStatus)
+			admin.GET("/orders", handler.GetAllOrders)
+			admin.GET("/orders/:id", handler.GetOrderByID)
+			admin.PATCH("/orders/:id/status", handler.UpdateOrderStatus)
 		}
 
 		address := api.Group("/address")
@@ -75,6 +78,12 @@ func SetupRoutes(r *gin.Engine) {
 		{
 			address.POST("", handler.CreateAddress)
 			address.GET("", handler.GetAddressByUserID)
+		}
+
+		payment := api.Group("/payments")
+		payment.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
+		{
+			payment.POST("/", handler.CreatePayment)
 		}
 	}
 }

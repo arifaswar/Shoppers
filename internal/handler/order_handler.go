@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
-	"shoppers/internal/service"
 	"shoppers/internal/dto"
+	"shoppers/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Checkout(c *gin.Context) {
@@ -21,12 +22,12 @@ func Checkout(c *gin.Context) {
 
 	response, err := service.Checkout(
 		userID,
-		req.AddressID,
+		req.AddressID.String(),
 	)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message" : err.Error(),
+			"message": err.Error(),
 		})
 		return
 	}
@@ -34,6 +35,17 @@ func Checkout(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func GetAllOrders(c *gin.Context) {
+
+	orders, err := service.GetAllOrders()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, orders)
+}
 func GetMyOrders(c *gin.Context) {
 
 	userID := c.GetString("user_id")
@@ -41,7 +53,7 @@ func GetMyOrders(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message" : err.Error(),
+			"message": err.Error(),
 		})
 		return
 	}
@@ -50,12 +62,12 @@ func GetMyOrders(c *gin.Context) {
 
 func GetOrderByID(c *gin.Context) {
 
-	orderID := c.Query("id")
+	orderID := c.Param("id")
 	order, err := service.GetOrderByID(orderID)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message" : err.Error(),
+			"message": err.Error(),
 		})
 		return
 	}
@@ -64,7 +76,7 @@ func GetOrderByID(c *gin.Context) {
 
 func UpdateOrderStatus(c *gin.Context) {
 
-	id := c.Param("id")
+	orderID := c.Param("id")
 
 	var req dto.UpdateOrderStatusRequest
 
@@ -78,7 +90,7 @@ func UpdateOrderStatus(c *gin.Context) {
 	}
 
 	err := service.UpdateOrderStatus(
-		id,
+		orderID,
 		req.Status,
 	)
 
@@ -93,5 +105,22 @@ func UpdateOrderStatus(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Order updated successfully",
+	})
+}
+
+func CancelOrder(c *gin.Context) {
+
+	orderID := c.Param("id")
+	userID := c.GetString("user_id")
+	err := service.CancelOrder(userID, orderID)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Order cancelled successfully",
 	})
 }
